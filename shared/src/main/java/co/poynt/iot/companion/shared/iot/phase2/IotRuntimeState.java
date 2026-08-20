@@ -35,6 +35,13 @@ public final class IotRuntimeState {
     public String pcmEndpoint = "—";
     public String tokenFingerprint = "none";
     public String overall = IotStatusSnapshot.UNKNOWN;
+    public String mqttState = "IDLE";
+    public int mqttAttempts;
+    public String mqttLastError = "—";
+    public String tokenState = "UNKNOWN";
+    public String lastErrorCode = co.poynt.iot.companion.shared.diagnostics.ErrorCode.NONE.code;
+    public String lastErrorDetail = "—";
+    public String networkSummary = "—";
 
     public void onMessage(@NonNull String topic, @NonNull String payload) {
         lastMessageAt = new SimpleDateFormat("HH:mm:ss", Locale.US).format(new Date());

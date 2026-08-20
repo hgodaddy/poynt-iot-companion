@@ -14,6 +14,7 @@ import co.poynt.cloudmessaging.iot.test.CompanionApp;
 import co.poynt.cloudmessaging.iot.test.databinding.ActivityDashboardBinding;
 import co.poynt.iot.companion.shared.CompanionFacade;
 import co.poynt.iot.companion.shared.DashboardSnapshot;
+import co.poynt.iot.companion.shared.diagnostics.DiagnosticSnapshot;
 import co.poynt.iot.companion.shared.iot.IotStatusSnapshot;
 import co.poynt.iot.companion.shared.iot.phase2.IotAction;
 import co.poynt.iot.companion.shared.iot.phase2.IotActionResult;
@@ -43,6 +44,7 @@ public class DashboardActivity extends AppCompatActivity implements IotControlle
         binding.btnSubscribe.setOnClickListener(v -> run(IotAction.SUBSCRIBE));
         binding.btnPublish.setOnClickListener(v -> run(IotAction.PUBLISH));
         binding.btnFullFlow.setOnClickListener(v -> run(IotAction.FULL_FLOW));
+        binding.btnDiagnostics.setOnClickListener(v -> run(IotAction.DIAGNOSTICS));
         binding.btnCollectLogs.setOnClickListener(v -> run(IotAction.EXPORT));
 
         render("startup");
@@ -69,6 +71,7 @@ public class DashboardActivity extends AppCompatActivity implements IotControlle
         DashboardSnapshot snapshot = facade.refresh(this);
         bindDevice(snapshot);
         bindIot(snapshot);
+        bindDiagnostics(snapshot.diagnostics);
         binding.evidenceLog.setText(facade.logger().asText());
         setButtonsEnabled(!facade.iot().isBusy());
     }
@@ -115,7 +118,29 @@ public class DashboardActivity extends AppCompatActivity implements IotControlle
         setStatus(binding.valueReceive, iot.receive);
         setStatus(binding.valueReconnect, iot.reconnect);
         setStatus(binding.valueOverall, iot.overall);
-        binding.valueLastMessage.setText(iot.lastMessageAt);
+        String last = iot.lastMessageAt;
+        if (iot.tokenDetail != null && !iot.tokenDetail.isEmpty()) {
+            binding.valueToken.setText(iot.gdToken);
+        }
+        binding.valueLastMessage.setText(last);
+    }
+
+    private void bindDiagnostics(@NonNull DiagnosticSnapshot diagnostics) {
+        binding.valueNetwork.setText(diagnostics.networkSummary);
+        tint(binding.valueNetwork, diagnostics.httpsReachable || diagnostics.wifiEnabled);
+
+        binding.valueMqttState.setText(diagnostics.mqttState + "  attempts=" + diagnostics.mqttAttempts);
+        colorStatus(binding.valueMqttState, diagnostics.mqttState);
+
+        binding.valueTokenState.setText(diagnostics.tokenState + "  fp=" + diagnostics.tokenFingerprint);
+        String tokenGate = "PRESENT".equals(diagnostics.tokenState)
+                ? IotStatusSnapshot.PASS
+                : ("UNKNOWN".equals(diagnostics.tokenState) ? IotStatusSnapshot.UNKNOWN : IotStatusSnapshot.FAIL);
+        colorStatus(binding.valueTokenState, tokenGate);
+
+        binding.valueLastError.setText(diagnostics.lastErrorCode + "  " + diagnostics.lastErrorDetail);
+        boolean noError = "IOT-000".equals(diagnostics.lastErrorCode);
+        binding.valueLastError.setTextColor(Color.parseColor(noError ? "#A0A0A0" : "#FF6B6B"));
     }
 
     private void setButtonsEnabled(boolean enabled) {
@@ -129,14 +154,22 @@ public class DashboardActivity extends AppCompatActivity implements IotControlle
         binding.btnSubscribe.setEnabled(enabled);
         binding.btnPublish.setEnabled(enabled);
         binding.btnFullFlow.setEnabled(enabled);
+        binding.btnDiagnostics.setEnabled(enabled);
         binding.btnCollectLogs.setEnabled(enabled);
     }
 
     private void setStatus(@NonNull TextView view, @NonNull String status) {
         view.setText(status);
-        if (IotStatusSnapshot.PASS.equals(status) || "CONNECTED".equals(status)) {
+        colorStatus(view, status);
+    }
+
+    private void colorStatus(@NonNull TextView view, @NonNull String status) {
+        if (IotStatusSnapshot.PASS.equals(status) || "CONNECTED".equals(status) || "PRESENT".equals(status)) {
             view.setTextColor(Color.parseColor("#3DDC97"));
-        } else if (IotStatusSnapshot.FAIL.equals(status)) {
+        } else if (IotStatusSnapshot.FAIL.equals(status)
+                || "EXPIRED".equals(status)
+                || "MISSING".equals(status)
+                || "INVALID".equals(status)) {
             view.setTextColor(Color.parseColor("#FF6B6B"));
         } else {
             view.setTextColor(Color.parseColor("#F4C95D"));

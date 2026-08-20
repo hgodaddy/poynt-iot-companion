@@ -123,7 +123,7 @@ public final class DiscoverClient {
         Request request = new Request.Builder()
                 .url(fourOneOne)
                 .header("Poynt-Request-Id", UUID.randomUUID().toString())
-                .header("User-Agent", "PoyntIoTCompanion/0.2")
+                .header("User-Agent", "PoyntIoTCompanion/0.3")
                 .get()
                 .build();
         try (Response response = http.newCall(request).execute()) {

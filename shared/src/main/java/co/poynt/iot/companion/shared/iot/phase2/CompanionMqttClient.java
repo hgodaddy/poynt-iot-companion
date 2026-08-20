@@ -60,6 +60,10 @@ public final class CompanionMqttClient implements Mqtt5ClientOptions.LifecycleEv
         return connected.get();
     }
 
+    public boolean isConnecting() {
+        return connecting.get();
+    }
+
     @NonNull
     public CompletableFuture<Boolean> connect(@NonNull MqttConnectParams params) {
         CompletableFuture<Boolean> future = new CompletableFuture<>();

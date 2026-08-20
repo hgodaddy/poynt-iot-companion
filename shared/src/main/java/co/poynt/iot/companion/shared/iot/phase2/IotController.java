@@ -19,6 +19,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import co.poynt.iot.companion.shared.config.EnvironmentConfig;
+import co.poynt.iot.companion.shared.diagnostics.DiagnosticSnapshot;
+import co.poynt.iot.companion.shared.diagnostics.DiagnosticsStore;
+import co.poynt.iot.companion.shared.diagnostics.ErrorCode;
+import co.poynt.iot.companion.shared.diagnostics.NetworkInspector;
 import co.poynt.iot.companion.shared.device.DeviceInspector;
 import co.poynt.iot.companion.shared.device.DeviceSnapshot;
 import co.poynt.iot.companion.shared.logging.EvidenceLogger;
@@ -46,6 +50,9 @@ public final class IotController implements CompanionMqttClient.Listener {
     private final GdTokenStore tokenStore;
     private final CompanionMqttClient mqtt;
     private final JsonResultWriter jsonWriter;
+    private final NetworkInspector networkInspector;
+    private final DiagnosticsStore diagnosticsStore;
+    private volatile DiagnosticSnapshot lastDiagnostics;
     private final ExecutorService executor = Executors.newSingleThreadExecutor(r -> {
         Thread t = new Thread(r, "IotController");
         t.setDaemon(true);
@@ -66,8 +73,16 @@ public final class IotController implements CompanionMqttClient.Listener {
         this.tokenStore = new GdTokenStore(appContext, logger);
         this.mqtt = new CompanionMqttClient(logger);
         this.jsonWriter = new JsonResultWriter(appContext);
+        this.networkInspector = new NetworkInspector(appContext);
+        this.diagnosticsStore = new DiagnosticsStore(appContext);
+        this.logger.setPersistSink(diagnosticsStore);
         this.mqtt.setListener(this);
         seedFromDevice();
+        refreshDiagnostics(false);
+        executor.execute(() -> {
+            refreshDiagnostics(true);
+            notifyUpdated();
+        });
     }
 
     public void setListener(@Nullable Listener listener) {
@@ -77,6 +92,14 @@ public final class IotController implements CompanionMqttClient.Listener {
     @NonNull
     public IotRuntimeState state() {
         return state;
+    }
+
+    @NonNull
+    public DiagnosticSnapshot diagnostics() {
+        if (lastDiagnostics == null) {
+            refreshDiagnostics(false);
+        }
+        return lastDiagnostics;
     }
 
     public boolean isBusy() {
@@ -95,6 +118,9 @@ public final class IotController implements CompanionMqttClient.Listener {
                         ? runFullFlow()
                         : runSingle(action);
                 state.computeOverall();
+                if (action != IotAction.DIAGNOSTICS) {
+                    refreshDiagnostics(false);
+                }
                 notifyComplete(result);
             } finally {
                 busy.set(false);
@@ -126,6 +152,8 @@ public final class IotController implements CompanionMqttClient.Listener {
                 return reconnect();
             case EXPORT:
                 return exportEvidence();
+            case DIAGNOSTICS:
+                return runDiagnostics();
             default:
                 return new IotActionResult(action, false, "Unknown action");
         }
@@ -208,6 +236,10 @@ public final class IotController implements CompanionMqttClient.Listener {
         if (result.ok) {
             return new IotActionResult(IotAction.DISCOVER, true, result.detail);
         }
+        ErrorCode code = result.detail != null && result.detail.toLowerCase().contains("timeout")
+                ? ErrorCode.DISCOVER_TIMEOUT
+                : ErrorCode.DISCOVER_HTTP;
+        recordError(code, result.detail);
         return new IotActionResult(IotAction.DISCOVER, false, result.detail);
     }
 
@@ -218,6 +250,7 @@ public final class IotController implements CompanionMqttClient.Listener {
         state.tokenFingerprint = inspect.fingerprint;
         state.gdTokenDetail = inspect.summary;
         if (inspect.present && !inspect.expired) {
+            state.tokenState = "PRESENT";
             if (!TextUtils.isEmpty(inspect.deviceId)) {
                 state.clientId = inspect.deviceId;
             }
@@ -226,6 +259,18 @@ public final class IotController implements CompanionMqttClient.Listener {
             return new IotActionResult(IotAction.TOKEN, true, inspect.summary);
         }
         state.gdToken = IotStatusSnapshot.FAIL;
+        ErrorCode code;
+        if (!inspect.present) {
+            code = ErrorCode.TOKEN_MISSING;
+            state.tokenState = "MISSING";
+        } else if (inspect.expired) {
+            code = ErrorCode.TOKEN_EXPIRED;
+            state.tokenState = "EXPIRED";
+        } else {
+            code = ErrorCode.TOKEN_INVALID;
+            state.tokenState = "INVALID";
+        }
+        recordError(code, inspect.summary);
         return new IotActionResult(IotAction.TOKEN, false, inspect.summary
                 + " — inject via adb: am broadcast -a co.poynt.cloudmessaging.iot.test.SET_GD_TOKEN --es token <jwt>");
     }
@@ -238,6 +283,8 @@ public final class IotController implements CompanionMqttClient.Listener {
             IotActionResult tokenResult = refreshToken();
             if (!tokenResult.pass) {
                 state.mqtt = IotStatusSnapshot.FAIL;
+                state.mqttState = "DISCONNECTED";
+                recordError(ErrorCode.MQTT_AUTH, "No valid GD token for MQTT auth");
                 return new IotActionResult(IotAction.MQTT_CONNECT, false, "No valid GD token for MQTT auth");
             }
             token = tokenStore.current();
@@ -253,6 +300,8 @@ public final class IotController implements CompanionMqttClient.Listener {
         if (TextUtils.isEmpty(state.clientId)) {
             state.clientId = resolveClientId(device);
         }
+        state.mqttAttempts++;
+        state.mqttState = "CONNECTING";
         boolean ok = waitFuture(mqtt.connect(new CompanionMqttClient.MqttConnectParams(
                 state.iotEndpoint,
                 state.clientId,
@@ -260,6 +309,12 @@ public final class IotController implements CompanionMqttClient.Listener {
                 token
         )), 30);
         state.mqtt = ok ? IotStatusSnapshot.PASS : IotStatusSnapshot.FAIL;
+        state.mqttState = ok ? "CONNECTED" : "DISCONNECTED";
+        if (!ok) {
+            recordError(ErrorCode.MQTT_CONNECT, "MQTT connect failed");
+        } else {
+            state.mqttLastError = "—";
+        }
         return new IotActionResult(IotAction.MQTT_CONNECT, ok, ok ? "CONNECTED" : "MQTT connect failed");
     }
 
@@ -269,6 +324,7 @@ public final class IotController implements CompanionMqttClient.Listener {
             IotActionResult connect = connectMqtt();
             if (!connect.pass) {
                 state.subscription = IotStatusSnapshot.FAIL;
+                recordError(ErrorCode.MQTT_NOT_CONNECTED, "MQTT not connected");
                 return new IotActionResult(IotAction.SUBSCRIBE, false, "MQTT not connected");
             }
         }
@@ -283,6 +339,9 @@ public final class IotController implements CompanionMqttClient.Listener {
         boolean ok = cloudOk && deviceOk;
         state.subscription = ok ? IotStatusSnapshot.PASS : IotStatusSnapshot.FAIL;
         String detail = "cloud=" + cloudOk + " deviceLoopback=" + deviceOk + " jobs=" + jobsOk;
+        if (!ok) {
+            recordError(ErrorCode.MQTT_SUBSCRIBE, detail);
+        }
         return new IotActionResult(IotAction.SUBSCRIBE, ok, detail);
     }
 
@@ -292,6 +351,7 @@ public final class IotController implements CompanionMqttClient.Listener {
             IotActionResult sub = subscribe();
             if (!sub.pass) {
                 state.publish = IotStatusSnapshot.FAIL;
+                recordError(ErrorCode.MQTT_PUBLISH, "Subscribe required before publish");
                 return new IotActionResult(IotAction.PUBLISH, false, "Subscribe required before publish");
             }
         }
@@ -311,6 +371,7 @@ public final class IotController implements CompanionMqttClient.Listener {
         boolean sent = mqtt.publish(topic, gson.toJson(test));
         state.publish = sent ? IotStatusSnapshot.PASS : IotStatusSnapshot.FAIL;
         if (!sent) {
+            recordError(ErrorCode.MQTT_PUBLISH, "Publish failed");
             return new IotActionResult(IotAction.PUBLISH, false, "Publish failed");
         }
         boolean received = awaitLatch(receiveLatch, 20);
@@ -339,6 +400,7 @@ public final class IotController implements CompanionMqttClient.Listener {
     private IotActionResult disconnect() {
         mqtt.disconnect();
         state.mqtt = "DISCONNECTED";
+        state.mqttState = "DISCONNECTED";
         return new IotActionResult(IotAction.DISCONNECT, true, "MQTT disconnect issued");
     }
 
@@ -363,6 +425,7 @@ public final class IotController implements CompanionMqttClient.Listener {
 
     @NonNull
     private IotActionResult exportEvidence() {
+        refreshDiagnostics(false);
         state.computeOverall();
         String path = jsonWriter.write(state, logger);
         logger.pass("Exported evidence " + path);
@@ -372,6 +435,8 @@ public final class IotController implements CompanionMqttClient.Listener {
     @Override
     public void onConnect() {
         state.mqtt = IotStatusSnapshot.PASS;
+        state.mqttState = "CONNECTED";
+        state.mqttLastError = "—";
         notifyUpdated();
     }
 
@@ -380,12 +445,13 @@ public final class IotController implements CompanionMqttClient.Listener {
         if (!IotStatusSnapshot.PASS.equals(state.reconnect)) {
             state.mqtt = "DISCONNECTED";
         }
+        state.mqttState = "DISCONNECTED";
         notifyUpdated();
     }
 
     @Override
     public void onError(@NonNull String error) {
-        logger.fail(error);
+        recordError(ErrorCode.MQTT_CONNECT, error);
         notifyUpdated();
     }
 
@@ -413,6 +479,9 @@ public final class IotController implements CompanionMqttClient.Listener {
             state.gdToken = stored.expired ? IotStatusSnapshot.FAIL : IotStatusSnapshot.PASS;
             state.gdTokenDetail = stored.summary;
             state.tokenFingerprint = stored.fingerprint;
+            state.tokenState = stored.expired ? "EXPIRED" : "PRESENT";
+        } else {
+            state.tokenState = "MISSING";
         }
     }
 
@@ -441,6 +510,7 @@ public final class IotController implements CompanionMqttClient.Listener {
             return Boolean.TRUE.equals(value);
         } catch (Exception e) {
             logger.fail("Timed out after " + seconds + "s: " + e.getMessage());
+            recordError(ErrorCode.MQTT_TIMEOUT, "Timed out after " + seconds + "s");
             return false;
         }
     }
@@ -455,6 +525,54 @@ public final class IotController implements CompanionMqttClient.Listener {
             Thread.currentThread().interrupt();
             return false;
         }
+    }
+
+    @NonNull
+    private IotActionResult runDiagnostics() {
+        String path = refreshDiagnostics(true);
+        boolean ok = path != null && lastDiagnostics != null;
+        String detail = lastDiagnostics == null ? "diagnostics unavailable" : lastDiagnostics.networkSummary;
+        if (ok) {
+            logger.pass("Diagnostics persisted " + path + " — " + detail);
+        } else {
+            logger.fail("Diagnostics persist failed");
+        }
+        return new IotActionResult(IotAction.DIAGNOSTICS, ok, ok ? detail + " @ " + path : "persist failed");
+    }
+
+    @Nullable
+    private String refreshDiagnostics(boolean probeHttps) {
+        NetworkInspector.NetworkSnapshot net = networkInspector.snapshot(probeHttps);
+        state.networkSummary = net.summary();
+        JwtInspector inspect = JwtInspector.inspect(tokenStore.current());
+        if (!inspect.present) {
+            state.tokenState = "MISSING";
+        } else if (inspect.summary.contains("not a JWT") || inspect.summary.contains("parse-error")) {
+            state.tokenState = "INVALID";
+        } else if (inspect.expired) {
+            state.tokenState = "EXPIRED";
+        } else {
+            state.tokenState = "PRESENT";
+        }
+        state.tokenFingerprint = inspect.fingerprint;
+        if (mqtt.isConnected()) {
+            state.mqttState = "CONNECTED";
+        } else if (mqtt.isConnecting()) {
+            state.mqttState = "CONNECTING";
+        } else {
+            state.mqttState = "DISCONNECTED";
+        }
+        lastDiagnostics = DiagnosticSnapshot.from(net, state, diagnosticsStore.directory().getAbsolutePath());
+        return diagnosticsStore.writeDiagnostics(lastDiagnostics, state);
+    }
+
+    private void recordError(@NonNull ErrorCode code, @NonNull String detail) {
+        state.lastErrorCode = code.code;
+        state.lastErrorDetail = detail;
+        if (code.name().startsWith("MQTT")) {
+            state.mqttLastError = detail;
+        }
+        logger.error(code.code, detail);
     }
 
     @NonNull

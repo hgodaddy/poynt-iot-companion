@@ -9,6 +9,7 @@ import co.poynt.iot.companion.shared.device.DeviceInspector;
 import co.poynt.iot.companion.shared.device.DeviceSnapshot;
 import co.poynt.iot.companion.shared.foundation.FoundationBinder;
 import co.poynt.iot.companion.shared.iot.IotStatusSnapshot;
+import co.poynt.iot.companion.shared.iot.phase2.IotAction;
 import co.poynt.iot.companion.shared.iot.phase2.IotController;
 import co.poynt.iot.companion.shared.iot.phase2.IotRuntimeState;
 import co.poynt.iot.companion.shared.logging.EvidenceLogger;
@@ -54,7 +55,8 @@ public final class CompanionFacade {
                 iot,
                 foundation,
                 environmentConfig.environment(),
-                "—".equals(runtime.iotEndpoint) ? environmentConfig.iotEndpoint() : runtime.iotEndpoint
+                "—".equals(runtime.iotEndpoint) ? environmentConfig.iotEndpoint() : runtime.iotEndpoint,
+                iotController.diagnostics()
         );
     }
 }

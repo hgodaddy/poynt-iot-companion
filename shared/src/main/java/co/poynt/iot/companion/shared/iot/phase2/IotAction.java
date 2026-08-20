@@ -13,5 +13,6 @@ public enum IotAction {
     DISCONNECT,
     RECONNECT,
     FULL_FLOW,
-    EXPORT
+    EXPORT,
+    DIAGNOSTICS
 }

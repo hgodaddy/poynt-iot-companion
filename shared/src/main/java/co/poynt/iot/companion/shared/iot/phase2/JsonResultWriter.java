@@ -58,6 +58,13 @@ public final class JsonResultWriter {
             json.put("mothershipUrl", state.mothershipUrl);
             json.put("lastCorrelationId", state.lastCorrelationId);
             json.put("lastMessageAt", state.lastMessageAt);
+            json.put("mqttState", state.mqttState);
+            json.put("mqttAttempts", state.mqttAttempts);
+            json.put("mqttLastError", state.mqttLastError);
+            json.put("tokenState", state.tokenState);
+            json.put("lastErrorCode", state.lastErrorCode);
+            json.put("lastErrorDetail", state.lastErrorDetail);
+            json.put("networkSummary", state.networkSummary);
             try (Writer writer = new OutputStreamWriter(new FileOutputStream(jsonFile), StandardCharsets.UTF_8)) {
                 writer.write(json.toString(2));
             }

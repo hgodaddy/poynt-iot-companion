@@ -1,6 +1,7 @@
 package co.poynt.iot.companion.shared.logging;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -17,13 +18,22 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public final class EvidenceLogger {
 
+    public interface PersistSink {
+        void onLine(@NonNull String line);
+    }
+
     private static final int MAX_ENTRIES = 400;
     private final CopyOnWriteArrayList<String> entries = new CopyOnWriteArrayList<>();
     private final SimpleDateFormat timeFormat;
+    private volatile PersistSink persistSink;
 
     public EvidenceLogger() {
         timeFormat = new SimpleDateFormat("HH:mm:ss.SSS", Locale.US);
         timeFormat.setTimeZone(TimeZone.getDefault());
+    }
+
+    public void setPersistSink(@Nullable PersistSink persistSink) {
+        this.persistSink = persistSink;
     }
 
     public void info(@NonNull String message) {
@@ -40,6 +50,10 @@ public final class EvidenceLogger {
 
     public void pending(@NonNull String message) {
         append("PEND", message);
+    }
+
+    public void error(@NonNull String code, @NonNull String message) {
+        append("ERR", code + "  " + message);
     }
 
     @NonNull
@@ -65,6 +79,10 @@ public final class EvidenceLogger {
     private void append(@NonNull String level, @NonNull String message) {
         String line = timeFormat.format(new Date()) + "  " + level + "  " + message;
         entries.add(line);
+        PersistSink sink = persistSink;
+        if (sink != null) {
+            sink.onLine(line);
+        }
         while (entries.size() > MAX_ENTRIES) {
             entries.remove(0);
         }

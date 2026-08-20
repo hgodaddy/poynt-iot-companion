@@ -2,6 +2,7 @@ package co.poynt.iot.companion.shared;
 
 import androidx.annotation.NonNull;
 
+import co.poynt.iot.companion.shared.diagnostics.DiagnosticSnapshot;
 import co.poynt.iot.companion.shared.device.DeviceSnapshot;
 import co.poynt.iot.companion.shared.foundation.FoundationBinder;
 import co.poynt.iot.companion.shared.iot.IotStatusSnapshot;
@@ -18,6 +19,7 @@ public final class DashboardSnapshot {
     public final FoundationBinder.FoundationStatus foundation;
     public final String environment;
     public final String iotEndpoint;
+    public final DiagnosticSnapshot diagnostics;
 
     public DashboardSnapshot(
             @NonNull DeviceSnapshot device,
@@ -25,12 +27,14 @@ public final class DashboardSnapshot {
             @NonNull IotStatusSnapshot iot,
             @NonNull FoundationBinder.FoundationStatus foundation,
             @NonNull String environment,
-            @NonNull String iotEndpoint) {
+            @NonNull String iotEndpoint,
+            @NonNull DiagnosticSnapshot diagnostics) {
         this.device = device;
         this.production = production;
         this.iot = iot;
         this.foundation = foundation;
         this.environment = environment;
         this.iotEndpoint = iotEndpoint;
+        this.diagnostics = diagnostics;
     }
 }

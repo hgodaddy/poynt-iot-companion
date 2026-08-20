@@ -4,6 +4,7 @@
     <string name="title">IoT Companion Test App</string>
     <string name="section_device">Device</string>
     <string name="section_iot">IoT Status</string>
+    <string name="section_diagnostics">Diagnostics</string>
     <string name="section_actions">Test actions</string>
     <string name="section_evidence">Evidence log</string>
     <string name="label_model">Model</string>
@@ -26,6 +27,10 @@
     <string name="label_reconnect">Reconnect</string>
     <string name="label_overall">Overall</string>
     <string name="label_last_message">Last Message</string>
+    <string name="label_network">Network</string>
+    <string name="label_mqtt_state">MQTT state</string>
+    <string name="label_token_state">Token state</string>
+    <string name="label_last_error">Last error</string>
     <string name="btn_refresh">Refresh dashboard</string>
     <string name="btn_eligibility">Check Eligibility</string>
     <string name="btn_discover">Run Discover</string>
@@ -36,5 +41,6 @@
     <string name="btn_subscribe">Subscribe</string>
     <string name="btn_publish">Publish Test Message</string>
     <string name="btn_full_flow">Run Full IoT Flow</string>
+    <string name="btn_diagnostics">Refresh diagnostics</string>
     <string name="btn_logs">Export evidence JSON</string>
 </resources>
