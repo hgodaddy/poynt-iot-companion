@@ -10,6 +10,7 @@ android {
         minSdk = 24
         consumerProguardFiles("consumer-rules.pro")
         buildConfigField("boolean", "FOUNDATION_BOUND", "false")
+        buildConfigField("boolean", "IOT_PROTOCOL_BOUND", "false")
         buildConfigField("String", "PRODUCTION_PACKAGE", "\"co.poynt.cloudmessaging\"")
         buildConfigField("String", "PRODUCTION_SERVICE", "\"co.poynt.cloudmessaging/.PcmService\"")
     }
