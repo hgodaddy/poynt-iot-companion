@@ -79,4 +79,37 @@ public final class IotStatusSnapshot {
         this.tokenDetail = tokenDetail;
         this.mothershipUrl = mothershipUrl;
     }
+
+    @NonNull
+    public static IotStatusSnapshot fromRuntime(
+            @NonNull co.poynt.iot.companion.shared.iot.phase2.IotRuntimeState runtime) {
+        return new IotStatusSnapshot(
+                status(runtime.eligibility),
+                text(runtime.eligibilityDetail),
+                status(runtime.discover),
+                text(runtime.discoverDetail),
+                status(runtime.gdToken),
+                status(runtime.mqtt),
+                status(runtime.subscription),
+                status(runtime.publish),
+                status(runtime.receive),
+                status(runtime.reconnect),
+                status(runtime.overall),
+                text(runtime.lastMessageAt),
+                text(runtime.discoveryUrl),
+                text(runtime.pcmEndpoint),
+                text(runtime.gdTokenDetail),
+                text(runtime.mothershipUrl)
+        );
+    }
+
+    @NonNull
+    private static String status(String value) {
+        return value == null || value.isEmpty() ? UNKNOWN : value;
+    }
+
+    @NonNull
+    private static String text(String value) {
+        return value == null || value.isEmpty() ? "—" : value;
+    }
 }

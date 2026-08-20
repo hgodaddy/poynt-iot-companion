@@ -26,7 +26,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="Phase 1 foundation · PST3 / P70 · observe device + production APK"
+            android:text="Phase 2 IoT controls · PST3 / P70 · production MQTT5 path"
             android:textColor="@color/text_muted"
             android:textSize="13sp" />
 
@@ -131,6 +131,16 @@
             android:text="@string/section_actions" />
 
         <com.google.android.material.button.MaterialButton android:id="@+id/btn_refresh" style="@style/Iot.Action" android:layout_width="match_parent" android:layout_height="wrap_content" android:contentDescription="@string/btn_refresh" android:text="@string/btn_refresh" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/btn_check_eligibility" style="@style/Iot.Action.Secondary" android:layout_width="match_parent" android:layout_height="wrap_content" android:contentDescription="@string/btn_eligibility" android:text="@string/btn_eligibility" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/btn_run_discover" style="@style/Iot.Action.Secondary" android:layout_width="match_parent" android:layout_height="wrap_content" android:contentDescription="@string/btn_discover" android:text="@string/btn_discover" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/btn_refresh_token" style="@style/Iot.Action.Secondary" android:layout_width="match_parent" android:layout_height="wrap_content" android:contentDescription="@string/btn_token" android:text="@string/btn_token" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/btn_connect_mqtt" style="@style/Iot.Action.Secondary" android:layout_width="match_parent" android:layout_height="wrap_content" android:contentDescription="@string/btn_connect" android:text="@string/btn_connect" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/btn_disconnect_mqtt" style="@style/Iot.Action.Secondary" android:layout_width="match_parent" android:layout_height="wrap_content" android:contentDescription="@string/btn_disconnect" android:text="@string/btn_disconnect" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/btn_reconnect" style="@style/Iot.Action.Secondary" android:layout_width="match_parent" android:layout_height="wrap_content" android:contentDescription="@string/btn_reconnect" android:text="@string/btn_reconnect" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/btn_subscribe" style="@style/Iot.Action.Secondary" android:layout_width="match_parent" android:layout_height="wrap_content" android:contentDescription="@string/btn_subscribe" android:text="@string/btn_subscribe" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/btn_publish" style="@style/Iot.Action.Secondary" android:layout_width="match_parent" android:layout_height="wrap_content" android:contentDescription="@string/btn_publish" android:text="@string/btn_publish" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/btn_full_flow" style="@style/Iot.Action" android:layout_width="match_parent" android:layout_height="wrap_content" android:contentDescription="@string/btn_full_flow" android:text="@string/btn_full_flow" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/btn_collect_logs" style="@style/Iot.Action.Secondary" android:layout_width="match_parent" android:layout_height="wrap_content" android:contentDescription="@string/btn_logs" android:text="@string/btn_logs" />
 
         <TextView
             style="@style/Iot.SectionTitle"

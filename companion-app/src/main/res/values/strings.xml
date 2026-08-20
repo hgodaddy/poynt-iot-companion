@@ -27,4 +27,14 @@
     <string name="label_overall">Overall</string>
     <string name="label_last_message">Last Message</string>
     <string name="btn_refresh">Refresh dashboard</string>
+    <string name="btn_eligibility">Check Eligibility</string>
+    <string name="btn_discover">Run Discover</string>
+    <string name="btn_token">Refresh Token</string>
+    <string name="btn_connect">Connect MQTT</string>
+    <string name="btn_disconnect">Disconnect MQTT</string>
+    <string name="btn_reconnect">Reconnect MQTT</string>
+    <string name="btn_subscribe">Subscribe</string>
+    <string name="btn_publish">Publish Test Message</string>
+    <string name="btn_full_flow">Run Full IoT Flow</string>
+    <string name="btn_logs">Export evidence JSON</string>
 </resources>

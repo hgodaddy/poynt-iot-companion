@@ -10,6 +10,7 @@ android {
         minSdk = 24
         consumerProguardFiles("consumer-rules.pro")
         buildConfigField("boolean", "FOUNDATION_BOUND", "false")
+        buildConfigField("boolean", "IOT_PROTOCOL_BOUND", "true")
         buildConfigField("String", "PRODUCTION_PACKAGE", "\"co.poynt.cloudmessaging\"")
         buildConfigField("String", "PRODUCTION_SERVICE", "\"co.poynt.cloudmessaging/.PcmService\"")
     }
@@ -17,6 +18,7 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+        isCoreLibraryDesugaringEnabled = true
     }
 
     buildFeatures {
@@ -25,5 +27,9 @@ android {
 }
 
 dependencies {
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
     implementation("androidx.annotation:annotation:1.9.1")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("com.google.code.gson:gson:2.11.0")
+    api("software.amazon.awssdk.iotdevicesdk:aws-iot-device-sdk-android:1.27.4")
 }

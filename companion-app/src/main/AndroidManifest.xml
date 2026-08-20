@@ -39,5 +39,13 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+
+        <receiver
+            android:name=".TokenInjectReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="co.poynt.cloudmessaging.iot.test.SET_GD_TOKEN" />
+            </intent-filter>
+        </receiver>
     </application>
 </manifest>
