@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">IoT Companion</string>
+    <string name="title">IoT Companion Test App</string>
+    <string name="section_device">Device</string>
+    <string name="section_iot">IoT Status</string>
+    <string name="section_actions">Test actions</string>
+    <string name="section_evidence">Evidence log</string>
+    <string name="label_model">Model</string>
+    <string name="label_serial">Serial</string>
+    <string name="label_poyntos">PoyntOS Version</string>
+    <string name="label_iot_enabled">IoT Enabled</string>
+    <string name="label_production">Production APK</string>
+    <string name="label_foundation">Foundation</string>
+    <string name="label_environment">Environment</string>
+    <string name="label_discovery">Discovery URL</string>
+    <string name="label_pcm">PCM Endpoint</string>
+    <string name="label_mothership">Mothership URL</string>
+    <string name="label_eligibility">Eligibility</string>
+    <string name="label_discover">Discover</string>
+    <string name="label_token">GD Token</string>
+    <string name="label_mqtt">MQTT</string>
+    <string name="label_subscription">Subscription</string>
+    <string name="label_publish">Publish</string>
+    <string name="label_receive">Receive / validate</string>
+    <string name="label_reconnect">Reconnect</string>
+    <string name="label_overall">Overall</string>
+    <string name="label_last_message">Last Message</string>
+    <string name="btn_refresh">Refresh dashboard</string>
+</resources>

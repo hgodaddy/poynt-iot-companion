@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_LOGS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
+    <queries>
+        <package android:name="co.poynt.cloudmessaging" />
+        <package android:name="co.poynt.services" />
+        <intent>
+            <action android:name="co.poynt.os.services.v1.IPoyntTokenService" />
+        </intent>
+    </queries>
+
+    <application
+        android:name=".CompanionApp"
+        android:allowBackup="false"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@drawable/ic_launcher"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.IotCompanion"
+        android:usesCleartextTraffic="false">
+
+        <activity
+            android:name=".ui.DashboardActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <!-- Stable automation entry point for Phase 5 Appium/ADB. -->
+            <intent-filter>
+                <action android:name="co.poynt.cloudmessaging.iot.test.DASHBOARD" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>

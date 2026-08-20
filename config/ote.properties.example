@@ -1,0 +1,6 @@
+# Environment = OTE
+# Copy to config/ote.properties (gitignored). Load into the companion via
+# adb or a local properties overlay — not hardcoded in the APK.
+
+iot.endpoint=
+discover.baseUrl=

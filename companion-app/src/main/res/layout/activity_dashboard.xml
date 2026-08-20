@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/dashboard_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg"
+    android:contentDescription="@string/title"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/title"
+            android:textColor="@color/text_primary"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Phase 1 foundation · PST3 / P70 · observe device + production APK"
+            android:textColor="@color/text_muted"
+            android:textSize="13sp" />
+
+        <TextView
+            style="@style/Iot.SectionTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="@string/section_device" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_panel"
+            android:orientation="vertical"
+            android:padding="14dp">
+
+            <TextView style="@style/Iot.Label" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/label_model" />
+            <TextView android:id="@+id/value_model" style="@style/Iot.Value" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="8dp" />
+
+            <TextView style="@style/Iot.Label" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/label_serial" />
+            <TextView android:id="@+id/value_serial" style="@style/Iot.Value" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="8dp" />
+
+            <TextView style="@style/Iot.Label" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/label_poyntos" />
+            <TextView android:id="@+id/value_poynt_os" style="@style/Iot.Value" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="8dp" />
+
+            <TextView style="@style/Iot.Label" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/label_iot_enabled" />
+            <TextView android:id="@+id/value_iot_enabled" style="@style/Iot.Value" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="8dp" />
+
+            <TextView style="@style/Iot.Label" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/label_production" />
+            <TextView android:id="@+id/value_production" style="@style/Iot.Value" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="8dp" />
+
+            <TextView style="@style/Iot.Label" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/label_foundation" />
+            <TextView android:id="@+id/value_foundation" style="@style/Iot.Value" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="8dp" />
+
+            <TextView style="@style/Iot.Label" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/label_environment" />
+            <TextView android:id="@+id/value_environment" style="@style/Iot.Value" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="8dp" />
+
+            <TextView style="@style/Iot.Label" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/label_discovery" />
+            <TextView android:id="@+id/value_discovery" style="@style/Iot.Value" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="8dp" />
+
+            <TextView style="@style/Iot.Label" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/label_pcm" />
+            <TextView android:id="@+id/value_pcm_endpoint" style="@style/Iot.Value" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="8dp" />
+
+            <TextView style="@style/Iot.Label" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/label_mothership" />
+            <TextView android:id="@+id/value_mothership" style="@style/Iot.Value" android:layout_width="match_parent" android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <TextView
+            style="@style/Iot.SectionTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="@string/section_iot" />
+
+        <LinearLayout
+            android:id="@+id/panel_iot_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_panel"
+            android:orientation="vertical"
+            android:padding="14dp">
+
+            <TextView style="@style/Iot.Label" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/label_eligibility" />
+            <TextView android:id="@+id/value_eligibility" style="@style/Iot.Value" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="8dp" />
+
+            <TextView style="@style/Iot.Label" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/label_discover" />
+            <TextView android:id="@+id/value_discover" style="@style/Iot.Value" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="8dp" />
+
+            <TextView style="@style/Iot.Label" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/label_token" />
+            <TextView android:id="@+id/value_token" style="@style/Iot.Value" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="8dp" />
+
+            <TextView style="@style/Iot.Label" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/label_mqtt" />
+            <TextView android:id="@+id/value_mqtt" style="@style/Iot.Value" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="8dp" />
+
+            <TextView style="@style/Iot.Label" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/label_subscription" />
+            <TextView android:id="@+id/value_subscription" style="@style/Iot.Value" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="8dp" />
+
+            <TextView style="@style/Iot.Label" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/label_publish" />
+            <TextView android:id="@+id/value_publish" style="@style/Iot.Value" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="8dp" />
+
+            <TextView style="@style/Iot.Label" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/label_receive" />
+            <TextView android:id="@+id/value_receive" style="@style/Iot.Value" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="8dp" />
+
+            <TextView style="@style/Iot.Label" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/label_reconnect" />
+            <TextView android:id="@+id/value_reconnect" style="@style/Iot.Value" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="8dp" />
+
+            <TextView style="@style/Iot.Label" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/label_overall" />
+            <TextView android:id="@+id/value_overall" style="@style/Iot.Value" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="8dp" />
+
+            <TextView style="@style/Iot.Label" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/label_last_message" />
+            <TextView android:id="@+id/value_last_message" style="@style/Iot.Value" android:layout_width="match_parent" android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <TextView
+            style="@style/Iot.SectionTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="@string/section_actions" />
+
+        <com.google.android.material.button.MaterialButton android:id="@+id/btn_refresh" style="@style/Iot.Action" android:layout_width="match_parent" android:layout_height="wrap_content" android:contentDescription="@string/btn_refresh" android:text="@string/btn_refresh" />
+
+        <TextView
+            style="@style/Iot.SectionTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="@string/section_evidence" />
+
+        <TextView
+            android:id="@+id/evidence_log"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_panel"
+            android:fontFamily="monospace"
+            android:minHeight="160dp"
+            android:padding="12dp"
+            android:textColor="@color/text_primary"
+            android:textIsSelectable="true"
+            android:textSize="12sp" />
+    </LinearLayout>
+</ScrollView>

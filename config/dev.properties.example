@@ -1,0 +1,6 @@
+# Environment = DEV
+# Copy to config/dev.properties (gitignored) and fill from a secure store.
+# Never put AWS keys, device certificates, or GD tokens in git.
+
+iot.endpoint=
+discover.baseUrl=
