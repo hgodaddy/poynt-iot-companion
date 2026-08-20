@@ -56,6 +56,34 @@ public final class DiscoverClient {
         }
     }
 
+    public void markInFlightForTest(boolean value) {
+        inFlight.set(value);
+    }
+
+    public boolean isInFlight() {
+        return inFlight.get();
+    }
+
+    @NonNull
+    public DiscoverResult probeUrl(@NonNull String url, int timeoutSeconds) {
+        OkHttpClient client = new OkHttpClient.Builder()
+                .connectTimeout(timeoutSeconds, TimeUnit.SECONDS)
+                .readTimeout(timeoutSeconds, TimeUnit.SECONDS)
+                .callTimeout(timeoutSeconds + 1, TimeUnit.SECONDS)
+                .build();
+        Request request = new Request.Builder().url(url).get().build();
+        long start = System.currentTimeMillis();
+        try (Response response = client.newCall(request).execute()) {
+            String detail = "HTTP " + response.code() + " in " + (System.currentTimeMillis() - start) + "ms";
+            if (response.isSuccessful()) {
+                return DiscoverResult.probeOk(detail);
+            }
+            return DiscoverResult.fail(detail);
+        } catch (Exception e) {
+            return DiscoverResult.fail(e.getClass().getSimpleName() + ": " + e.getMessage());
+        }
+    }
+
     @NonNull
     private DiscoverResult discoverInternal(@NonNull String environment, @NonNull String serial, @Nullable String deviceId) {
         String fourOneOne = fourOneOneUrl(environment);
@@ -229,6 +257,10 @@ public final class DiscoverClient {
 
         static DiscoverResult inFlight() {
             return new DiscoverResult(false, false, "FAIL", "Discover already in flight", "—", null);
+        }
+
+        static DiscoverResult probeOk(String detail) {
+            return new DiscoverResult(true, false, "PASS", detail, "—", null);
         }
 
         static DiscoverResult fail(String detail) {

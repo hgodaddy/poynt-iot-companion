@@ -42,6 +42,7 @@ public final class IotRuntimeState {
     public String lastErrorCode = co.poynt.iot.companion.shared.diagnostics.ErrorCode.NONE.code;
     public String lastErrorDetail = "—";
     public String networkSummary = "—";
+    public String negativeSummary = "—";
 
     public void onMessage(@NonNull String topic, @NonNull String payload) {
         lastMessageAt = new SimpleDateFormat("HH:mm:ss", Locale.US).format(new Date());

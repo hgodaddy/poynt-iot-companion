@@ -10,6 +10,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
@@ -22,6 +23,8 @@ import co.poynt.iot.companion.shared.config.EnvironmentConfig;
 import co.poynt.iot.companion.shared.diagnostics.DiagnosticSnapshot;
 import co.poynt.iot.companion.shared.diagnostics.DiagnosticsStore;
 import co.poynt.iot.companion.shared.diagnostics.ErrorCode;
+import co.poynt.iot.companion.shared.diagnostics.NegativeScenarioResult;
+import co.poynt.iot.companion.shared.diagnostics.NegativeTestHarness;
 import co.poynt.iot.companion.shared.diagnostics.NetworkInspector;
 import co.poynt.iot.companion.shared.device.DeviceInspector;
 import co.poynt.iot.companion.shared.device.DeviceSnapshot;
@@ -52,6 +55,7 @@ public final class IotController implements CompanionMqttClient.Listener {
     private final JsonResultWriter jsonWriter;
     private final NetworkInspector networkInspector;
     private final DiagnosticsStore diagnosticsStore;
+    private final NegativeTestHarness negativeHarness;
     private volatile DiagnosticSnapshot lastDiagnostics;
     private final ExecutorService executor = Executors.newSingleThreadExecutor(r -> {
         Thread t = new Thread(r, "IotController");
@@ -76,6 +80,8 @@ public final class IotController implements CompanionMqttClient.Listener {
         this.networkInspector = new NetworkInspector(appContext);
         this.diagnosticsStore = new DiagnosticsStore(appContext);
         this.logger.setPersistSink(diagnosticsStore);
+        this.negativeHarness = new NegativeTestHarness(
+                logger, tokenStore, mqtt, discoverClient, networkInspector, env, state);
         this.mqtt.setListener(this);
         seedFromDevice();
         refreshDiagnostics(false);
@@ -154,6 +160,16 @@ public final class IotController implements CompanionMqttClient.Listener {
                 return exportEvidence();
             case DIAGNOSTICS:
                 return runDiagnostics();
+            case NEG_TOKEN:
+                return runNegatives(action, negativeHarness.runToken());
+            case NEG_DISCOVER:
+                return runNegatives(action, negativeHarness.runDiscover());
+            case NEG_MQTT:
+                return runNegatives(action, negativeHarness.runMqtt());
+            case NEG_NETWORK:
+                return runNegatives(action, negativeHarness.runNetwork());
+            case NEG_SUITE:
+                return runNegatives(action, negativeHarness.runAll());
             default:
                 return new IotActionResult(action, false, "Unknown action");
         }
@@ -538,6 +554,35 @@ public final class IotController implements CompanionMqttClient.Listener {
             logger.fail("Diagnostics persist failed");
         }
         return new IotActionResult(IotAction.DIAGNOSTICS, ok, ok ? detail + " @ " + path : "persist failed");
+    }
+
+    @NonNull
+    private IotActionResult runNegatives(@NonNull IotAction action, @NonNull List<NegativeScenarioResult> results) {
+        int pass = 0;
+        int fail = 0;
+        int skipped = 0;
+        for (NegativeScenarioResult result : results) {
+            if (result.isFail()) {
+                fail++;
+                logger.fail(result.toString());
+            } else if ("SKIPPED".equals(result.status)) {
+                skipped++;
+                logger.info("SKIPPED " + result);
+            } else {
+                pass++;
+                logger.pass(result.toString());
+            }
+        }
+        state.negativeSummary = pass + " pass / " + fail + " fail / " + skipped + " skipped";
+        String path = diagnosticsStore.writeNegativeResults(results);
+        boolean ok = fail == 0;
+        String detail = state.negativeSummary + (path == null ? "" : " @ " + path);
+        if (ok) {
+            logger.pass("Negative " + action + " PASS — " + detail);
+        } else {
+            logger.fail("Negative " + action + " FAIL — " + detail);
+        }
+        return new IotActionResult(action, ok, detail);
     }
 
     @Nullable

@@ -53,6 +53,11 @@ public final class GdTokenStore {
      */
     @Nullable
     public String obtain() {
+        return obtain(true);
+    }
+
+    @Nullable
+    public String obtain(boolean allowLogcatHarvest) {
         String stored = current();
         if (stored != null) {
             JwtInspector inspect = JwtInspector.inspect(stored);
@@ -60,7 +65,12 @@ public final class GdTokenStore {
                 logger.info("GD token from companion store " + inspect.summary);
                 return stored;
             }
-            logger.info("Stored GD token unusable (" + inspect.summary + "), trying logcat");
+            logger.info("Stored GD token unusable (" + inspect.summary + ")"
+                    + (allowLogcatHarvest ? ", trying logcat" : ""));
+        }
+        if (!allowLogcatHarvest) {
+            logger.fail("GD token not present in companion store");
+            return null;
         }
         String harvested = harvestFromLogcat();
         if (harvested != null) {

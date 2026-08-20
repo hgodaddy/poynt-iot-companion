@@ -14,5 +14,10 @@ public enum IotAction {
     RECONNECT,
     FULL_FLOW,
     EXPORT,
-    DIAGNOSTICS
+    DIAGNOSTICS,
+    NEG_TOKEN,
+    NEG_DISCOVER,
+    NEG_MQTT,
+    NEG_NETWORK,
+    NEG_SUITE
 }

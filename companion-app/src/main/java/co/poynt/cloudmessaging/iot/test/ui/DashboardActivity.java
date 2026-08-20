@@ -45,6 +45,11 @@ public class DashboardActivity extends AppCompatActivity implements IotControlle
         binding.btnPublish.setOnClickListener(v -> run(IotAction.PUBLISH));
         binding.btnFullFlow.setOnClickListener(v -> run(IotAction.FULL_FLOW));
         binding.btnDiagnostics.setOnClickListener(v -> run(IotAction.DIAGNOSTICS));
+        binding.btnNegToken.setOnClickListener(v -> run(IotAction.NEG_TOKEN));
+        binding.btnNegDiscover.setOnClickListener(v -> run(IotAction.NEG_DISCOVER));
+        binding.btnNegMqtt.setOnClickListener(v -> run(IotAction.NEG_MQTT));
+        binding.btnNegNetwork.setOnClickListener(v -> run(IotAction.NEG_NETWORK));
+        binding.btnNegSuite.setOnClickListener(v -> run(IotAction.NEG_SUITE));
         binding.btnCollectLogs.setOnClickListener(v -> run(IotAction.EXPORT));
 
         render("startup");
@@ -141,6 +146,16 @@ public class DashboardActivity extends AppCompatActivity implements IotControlle
         binding.valueLastError.setText(diagnostics.lastErrorCode + "  " + diagnostics.lastErrorDetail);
         boolean noError = "IOT-000".equals(diagnostics.lastErrorCode);
         binding.valueLastError.setTextColor(Color.parseColor(noError ? "#A0A0A0" : "#FF6B6B"));
+
+        String summary = facade.iot().state().negativeSummary;
+        binding.valueNegative.setText(summary);
+        if ("—".equals(summary)) {
+            colorStatus(binding.valueNegative, IotStatusSnapshot.UNKNOWN);
+        } else if (summary.contains("/ 0 fail")) {
+            colorStatus(binding.valueNegative, IotStatusSnapshot.PASS);
+        } else {
+            colorStatus(binding.valueNegative, IotStatusSnapshot.FAIL);
+        }
     }
 
     private void setButtonsEnabled(boolean enabled) {
@@ -155,6 +170,11 @@ public class DashboardActivity extends AppCompatActivity implements IotControlle
         binding.btnPublish.setEnabled(enabled);
         binding.btnFullFlow.setEnabled(enabled);
         binding.btnDiagnostics.setEnabled(enabled);
+        binding.btnNegToken.setEnabled(enabled);
+        binding.btnNegDiscover.setEnabled(enabled);
+        binding.btnNegMqtt.setEnabled(enabled);
+        binding.btnNegNetwork.setEnabled(enabled);
+        binding.btnNegSuite.setEnabled(enabled);
         binding.btnCollectLogs.setEnabled(enabled);
     }
 

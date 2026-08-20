@@ -5,6 +5,7 @@
     <string name="section_device">Device</string>
     <string name="section_iot">IoT Status</string>
     <string name="section_diagnostics">Diagnostics</string>
+    <string name="section_negative">Negative tests</string>
     <string name="section_actions">Test actions</string>
     <string name="section_evidence">Evidence log</string>
     <string name="label_model">Model</string>
@@ -31,6 +32,7 @@
     <string name="label_mqtt_state">MQTT state</string>
     <string name="label_token_state">Token state</string>
     <string name="label_last_error">Last error</string>
+    <string name="label_negative">Negative suite</string>
     <string name="btn_refresh">Refresh dashboard</string>
     <string name="btn_eligibility">Check Eligibility</string>
     <string name="btn_discover">Run Discover</string>
@@ -42,5 +44,10 @@
     <string name="btn_publish">Publish Test Message</string>
     <string name="btn_full_flow">Run Full IoT Flow</string>
     <string name="btn_diagnostics">Refresh diagnostics</string>
+    <string name="btn_neg_token">Negative: token</string>
+    <string name="btn_neg_discover">Negative: Discover</string>
+    <string name="btn_neg_mqtt">Negative: MQTT</string>
+    <string name="btn_neg_network">Negative: network</string>
+    <string name="btn_neg_suite">Run full negative suite</string>
     <string name="btn_logs">Export evidence JSON</string>
 </resources>

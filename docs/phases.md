@@ -8,26 +8,27 @@
 
 `feature/companion-test-app-phase-2`
 
-Live Discover, GD token, MQTT5, pub/sub, reconnect, JSON export.
+## Phase 3 — Diagnostics (done)
 
-## Phase 3 — Diagnostics (this branch)
+`feature/companion-test-app-phase-3`
 
-Persistent diagnostics for QA / PHMP:
+## Phase 4 — Negative testing (this branch)
 
-- Network / Wi-Fi / internet probe (411 HTTPS RTT)
-- MQTT state and attempt count
-- Token state (fingerprint only)
-- Stable error codes (`IOT-NET-*`, `IOT-DSC-*`, `IOT-TOK-*`, `IOT-MQTT-*`)
-- Files: `iot-diagnostics.json`, `iot-companion-evidence.txt`, `iot-companion-result.json`
+PASS means the companion **correctly detected** the failure. SKIPPED is allowed (suite still PASS). Overall FAIL if any scenario FAILs.
 
-## Phase 4 — Negative testing
+| Group | Scenarios |
+|---|---|
+| Token | missing store, expired JWT, invalid JWT (restores previous token) |
+| Discover | timeout (`192.0.2.1`), HTTP 404 path, duplicate in-flight, invalid host |
+| MQTT | publish/subscribe while disconnected, junk JWT connect, invalid host timeout |
+| Network | blackhole `192.0.2.1:443`; Wi-Fi off/on (SKIPPED with `adb shell svc wifi disable` if the APK cannot toggle) |
 
-`feature/companion-test-app-phase-4`
+Results: `iot-negative-results.json`.
 
 ## Phase 5 — Automation
 
-Appium/UIAutomator on view ids, consume JSON in PHMP.
+Appium/UIAutomator on view ids, consume `iot-companion-result.json` / `iot-negative-results.json` in PHMP.
 
 ## Phase 6 — Release validation
 
-Nightly PoyntOS → install production + companion → full IoT suite → PHMP pass/fail.
+Nightly PoyntOS → install production + companion → full IoT suite + negative suite → PHMP pass/fail.
