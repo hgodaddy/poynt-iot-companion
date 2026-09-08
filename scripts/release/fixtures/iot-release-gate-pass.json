@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "1.0",
+  "checkName": "IoT Release Gate Decision",
+  "packageName": "co.poynt.cloudmessaging.iot.test",
+  "companionVersion": "0.6.0-phase6",
+  "productionPackage": "co.poynt.cloudmessaging",
+  "productionVersion": "simulate",
+  "buildId": "simulate",
+  "passed": true,
+  "skipped": false,
+  "releaseReady": true,
+  "status": "PASS",
+  "message": "PASS — nightly IoT build is release-ready",
+  "checks": [
+    {"name": "Production Cloud Messaging APK", "passed": true, "skipped": false, "status": "PASS", "critical": true, "message": "INSTALLED (simulate)"},
+    {"name": "Companion Test App", "passed": true, "skipped": false, "status": "PASS", "critical": true, "message": "v0.6.0-phase6"},
+    {"name": "Device / PoyntOS", "passed": true, "skipped": false, "status": "PASS", "critical": true, "message": "model=P70 (simulate)"},
+    {"name": "IoT Companion Gate", "passed": true, "skipped": false, "status": "PASS", "critical": true, "message": "flow=PASS negatives=PASS"}
+  ]
+}

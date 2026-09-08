@@ -1,0 +1,80 @@
+name: IoT Companion Nightly Release Gate
+
+on:
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "Execution mode"
+        required: true
+        default: simulate
+        type: choice
+        options:
+          - simulate
+          - device
+
+jobs:
+  validate:
+    name: IoT release gate (${{ github.event.inputs.mode || 'simulate' }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    env:
+      MODE: ${{ github.event.inputs.mode || 'simulate' }}
+      BUILD_ID: ${{ github.run_id }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Set up Android SDK
+        if: env.MODE == 'simulate'
+        uses: android-actions/setup-android@v3
+
+      - name: Simulate evaluators
+        run: bash scripts/release/verify-simulate.sh
+
+      - name: Assemble companion (simulate)
+        if: env.MODE == 'simulate'
+        run: ./gradlew :companion-app:assembleDebug
+
+      - name: Device gate
+        if: env.MODE == 'device'
+        run: |
+          echo "GitHub-hosted runners have no Poynt terminal."
+          echo "Run MODE=device on a lab host: ./scripts/release/run-nightly-gate.sh"
+          exit 1
+
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: iot-phase6-artifacts-${{ github.run_id }}
+          path: |
+            reports/**
+            companion-app/build/outputs/apk/debug/*.apk
+          if-no-files-found: warn
+
+      - name: Release gate summary
+        if: always()
+        run: |
+          echo "## IoT Companion Nightly Gate" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Mode: \`${MODE}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Build: \`${BUILD_ID}\`" >> "$GITHUB_STEP_SUMMARY"
+          if [[ -f reports/iot-release-gate.html ]]; then
+            echo "- Report: \`reports/iot-release-gate.html\`" >> "$GITHUB_STEP_SUMMARY"
+          fi
+          if [[ -f reports/history/summary.jsonl ]]; then
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "### Latest history" >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            tail -n 5 reports/history/summary.jsonl >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+          fi

@@ -26,7 +26,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="Phase 5 automation · PST3 / P70"
+            android:text="Phase 6 release gate · PST3 / P70"
             android:textColor="@color/text_muted"
             android:textSize="13sp" />
 
@@ -152,7 +152,10 @@
             <TextView android:id="@+id/value_last_error" style="@style/Iot.Value" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="8dp" />
 
             <TextView style="@style/Iot.Label" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/label_negative" />
-            <TextView android:id="@+id/value_negative" style="@style/Iot.Value" android:layout_width="match_parent" android:layout_height="wrap_content" />
+            <TextView android:id="@+id/value_negative" style="@style/Iot.Value" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="8dp" />
+
+            <TextView style="@style/Iot.Label" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/label_release" />
+            <TextView android:id="@+id/value_release" style="@style/Iot.Value" android:layout_width="match_parent" android:layout_height="wrap_content" />
         </LinearLayout>
 
         <TextView
@@ -187,6 +190,7 @@
         <com.google.android.material.button.MaterialButton android:id="@+id/btn_neg_network" style="@style/Iot.Action.Secondary" android:layout_width="match_parent" android:layout_height="wrap_content" android:contentDescription="@string/btn_neg_network" android:text="@string/btn_neg_network" />
         <com.google.android.material.button.MaterialButton android:id="@+id/btn_neg_suite" style="@style/Iot.Action" android:layout_width="match_parent" android:layout_height="wrap_content" android:contentDescription="@string/btn_neg_suite" android:text="@string/btn_neg_suite" />
         <com.google.android.material.button.MaterialButton android:id="@+id/btn_phmp_gate" style="@style/Iot.Action" android:layout_width="match_parent" android:layout_height="wrap_content" android:contentDescription="@string/btn_phmp_gate" android:text="@string/btn_phmp_gate" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/btn_release_gate" style="@style/Iot.Action" android:layout_width="match_parent" android:layout_height="wrap_content" android:contentDescription="@string/btn_release_gate" android:text="@string/btn_release_gate" />
         <com.google.android.material.button.MaterialButton android:id="@+id/btn_collect_logs" style="@style/Iot.Action.Secondary" android:layout_width="match_parent" android:layout_height="wrap_content" android:contentDescription="@string/btn_logs" android:text="@string/btn_logs" />
 
         <TextView

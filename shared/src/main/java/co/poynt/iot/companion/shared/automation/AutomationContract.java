@@ -22,19 +22,23 @@ public final class AutomationContract {
     public static final String EXTRA_ACTION = "action";
     public static final String EXTRA_TOKEN = "token";
     public static final String EXTRA_TIMEOUT_SEC = "timeoutSec";
+    public static final String EXTRA_BUILD_ID = "buildId";
 
     public static final String RESULT_FILE = "iot-companion-result.json";
     public static final String DIAGNOSTICS_FILE = "iot-diagnostics.json";
     public static final String NEGATIVE_FILE = "iot-negative-results.json";
     public static final String GATE_FILE = "iot-phmp-gate.json";
+    public static final String RELEASE_FILE = "iot-release-gate.json";
     public static final String EVIDENCE_FILE = "iot-companion-evidence.txt";
 
     public static final String SCHEMA_VERSION = "1.0";
     public static final String CHECK_NAME = "IoT Companion Gate";
+    public static final String RELEASE_CHECK_NAME = "IoT Release Gate Decision";
 
     public static final String PRODUCTION_PACKAGE = "co.poynt.cloudmessaging";
 
     public static final int DEFAULT_TIMEOUT_SEC = 240;
+    public static final int RELEASE_TIMEOUT_SEC = 360;
 
     private AutomationContract() {
     }

@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "1.0",
+  "checkName": "IoT Release Gate Decision",
+  "packageName": "co.poynt.cloudmessaging.iot.test",
+  "companionVersion": "0.6.0-phase6",
+  "buildId": "simulate",
+  "passed": true,
+  "skipped": true,
+  "releaseReady": false,
+  "status": "SKIP",
+  "message": "SKIP — IoT release not certifiable (critical check unevaluated)",
+  "checks": [
+    {"name": "IoT Companion Gate", "passed": true, "skipped": true, "status": "SKIP", "critical": true, "message": "No lab device"}
+  ]
+}

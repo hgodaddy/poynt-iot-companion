@@ -13,7 +13,7 @@ public class CompanionApp extends Application {
     public void onCreate() {
         super.onCreate();
         EvidenceLogger logger = new EvidenceLogger();
-        logger.info("Companion Test App v0.5 Phase 5 started");
+        logger.info("Companion Test App v0.6 Phase 6 started");
         facade = new CompanionFacade(this, logger);
     }
 

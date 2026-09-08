@@ -43,6 +43,8 @@ public final class IotRuntimeState {
     public String lastErrorDetail = "—";
     public String networkSummary = "—";
     public String negativeSummary = "—";
+    public String buildId = "local";
+    public String releaseSummary = "—";
 
     public void onMessage(@NonNull String topic, @NonNull String payload) {
         lastMessageAt = new SimpleDateFormat("HH:mm:ss", Locale.US).format(new Date());

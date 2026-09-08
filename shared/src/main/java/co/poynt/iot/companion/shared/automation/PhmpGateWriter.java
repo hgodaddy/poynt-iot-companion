@@ -97,7 +97,8 @@ public final class PhmpGateWriter {
                     .put("diagnostics", AutomationContract.DIAGNOSTICS_FILE)
                     .put("negative", AutomationContract.NEGATIVE_FILE)
                     .put("evidence", AutomationContract.EVIDENCE_FILE)
-                    .put("gate", AutomationContract.GATE_FILE));
+                    .put("gate", AutomationContract.GATE_FILE)
+                    .put("release", AutomationContract.RELEASE_FILE));
             File file = new File(dir, AutomationContract.GATE_FILE);
             try (Writer writer = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8)) {
                 writer.write(json.toString(2));

@@ -11,7 +11,7 @@ import co.poynt.iot.companion.shared.iot.phase2.IotActionResult;
 
 /**
  * Headless ADB:
- * {@code adb shell am broadcast -a co.poynt.cloudmessaging.iot.test.RUN_ACTION --es action PHMP_GATE --ei timeoutSec 240}
+ * {@code adb shell am broadcast -a co.poynt.cloudmessaging.iot.test.RUN_ACTION --es action RELEASE_GATE --es buildId nightly --ei timeoutSec 360}
  */
 public class AutomationReceiver extends BroadcastReceiver {
 
@@ -35,10 +35,13 @@ public class AutomationReceiver extends BroadcastReceiver {
         }
         int timeoutSec = intent.getIntExtra(
                 AutomationContract.EXTRA_TIMEOUT_SEC,
-                AutomationContract.DEFAULT_TIMEOUT_SEC);
+                action == IotAction.RELEASE_GATE
+                        ? AutomationContract.RELEASE_TIMEOUT_SEC
+                        : AutomationContract.DEFAULT_TIMEOUT_SEC);
         if (timeoutSec < 10) {
             timeoutSec = 10;
         }
+        app.facade().iot().setBuildId(intent.getStringExtra(AutomationContract.EXTRA_BUILD_ID));
         PendingResult pending = goAsync();
         int timeoutMsCap = timeoutSec;
         new Thread(() -> {

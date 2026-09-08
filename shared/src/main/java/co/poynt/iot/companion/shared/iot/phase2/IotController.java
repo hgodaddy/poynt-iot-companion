@@ -20,6 +20,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import co.poynt.iot.companion.shared.automation.PhmpGateWriter;
+import co.poynt.iot.companion.shared.automation.ReleaseGateWriter;
 import co.poynt.iot.companion.shared.config.EnvironmentConfig;
 import co.poynt.iot.companion.shared.diagnostics.DiagnosticSnapshot;
 import co.poynt.iot.companion.shared.diagnostics.DiagnosticsStore;
@@ -55,6 +56,7 @@ public final class IotController implements CompanionMqttClient.Listener {
     private final CompanionMqttClient mqtt;
     private final JsonResultWriter jsonWriter;
     private final PhmpGateWriter phmpGateWriter;
+    private final ReleaseGateWriter releaseGateWriter;
     private final NetworkInspector networkInspector;
     private final DiagnosticsStore diagnosticsStore;
     private final NegativeTestHarness negativeHarness;
@@ -80,6 +82,7 @@ public final class IotController implements CompanionMqttClient.Listener {
         this.mqtt = new CompanionMqttClient(logger);
         this.jsonWriter = new JsonResultWriter(appContext);
         this.phmpGateWriter = new PhmpGateWriter(appContext);
+        this.releaseGateWriter = new ReleaseGateWriter(appContext);
         this.networkInspector = new NetworkInspector(appContext);
         this.diagnosticsStore = new DiagnosticsStore(appContext);
         this.logger.setPersistSink(diagnosticsStore);
@@ -113,6 +116,12 @@ public final class IotController implements CompanionMqttClient.Listener {
 
     public boolean isBusy() {
         return busy.get();
+    }
+
+    public void setBuildId(@Nullable String buildId) {
+        if (buildId != null && !buildId.trim().isEmpty()) {
+            state.buildId = buildId.trim();
+        }
     }
 
     public void execute(@NonNull IotAction action) {
@@ -185,6 +194,9 @@ public final class IotController implements CompanionMqttClient.Listener {
         }
         if (action == IotAction.PHMP_GATE) {
             return runPhmpGate();
+        }
+        if (action == IotAction.RELEASE_GATE) {
+            return runReleaseGate();
         }
         return runSingle(action);
     }
@@ -278,6 +290,29 @@ public final class IotController implements CompanionMqttClient.Listener {
             logger.fail("PHMP_GATE FAIL — " + detail);
         }
         return new IotActionResult(IotAction.PHMP_GATE, pass, detail);
+    }
+
+    @NonNull
+    private IotActionResult runReleaseGate() {
+        logger.info("RELEASE_GATE start — production + companion + PHMP_GATE");
+        ProductionAppSnapshot production = productionInspector.inspect(appContext);
+        DeviceSnapshot device = deviceInspector.inspect();
+        IotActionResult phmp = runPhmpGate();
+        notifyUpdated();
+        String path = releaseGateWriter.write(state, production, device, phmp);
+        boolean prodOk = production.installed && production.enabled;
+        boolean pass = prodOk && phmp.pass;
+        state.releaseSummary = pass ? "PASS" : "FAIL";
+        jsonWriter.write(state, logger);
+        String detail = "production=" + production.installedLabel()
+                + " phmp=" + phmp.status
+                + (path == null ? "" : " release=" + path);
+        if (pass) {
+            logger.pass("RELEASE_GATE PASS — " + detail);
+        } else {
+            logger.fail("RELEASE_GATE FAIL — " + detail);
+        }
+        return new IotActionResult(IotAction.RELEASE_GATE, pass, detail);
     }
 
     @NonNull

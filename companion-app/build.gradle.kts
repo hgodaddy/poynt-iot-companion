@@ -10,8 +10,8 @@ android {
         applicationId = "co.poynt.cloudmessaging.iot.test"
         minSdk = 24
         targetSdk = 34
-        versionCode = 5
-        versionName = "0.5.0-phase5"
+        versionCode = 6
+        versionName = "0.6.0-phase6"
         ndk {
             abiFilters += listOf("arm64-v8a", "armeabi-v7a")
         }

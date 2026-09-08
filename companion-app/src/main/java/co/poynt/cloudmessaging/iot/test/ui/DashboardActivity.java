@@ -54,6 +54,7 @@ public class DashboardActivity extends AppCompatActivity implements IotControlle
         binding.btnNegNetwork.setOnClickListener(v -> run(IotAction.NEG_NETWORK));
         binding.btnNegSuite.setOnClickListener(v -> run(IotAction.NEG_SUITE));
         binding.btnPhmpGate.setOnClickListener(v -> run(IotAction.PHMP_GATE));
+        binding.btnReleaseGate.setOnClickListener(v -> run(IotAction.RELEASE_GATE));
         binding.btnCollectLogs.setOnClickListener(v -> run(IotAction.EXPORT));
 
         render("startup");
@@ -188,6 +189,11 @@ public class DashboardActivity extends AppCompatActivity implements IotControlle
         } else {
             colorStatus(binding.valueNegative, IotStatusSnapshot.FAIL);
         }
+
+        String release = facade.iot().state().releaseSummary;
+        binding.valueRelease.setText(release);
+        binding.valueRelease.setContentDescription(release);
+        colorStatus(binding.valueRelease, "—".equals(release) ? IotStatusSnapshot.UNKNOWN : release);
     }
 
     private void setButtonsEnabled(boolean enabled) {
@@ -208,6 +214,7 @@ public class DashboardActivity extends AppCompatActivity implements IotControlle
         binding.btnNegNetwork.setEnabled(enabled);
         binding.btnNegSuite.setEnabled(enabled);
         binding.btnPhmpGate.setEnabled(enabled);
+        binding.btnReleaseGate.setEnabled(enabled);
         binding.btnCollectLogs.setEnabled(enabled);
     }
 

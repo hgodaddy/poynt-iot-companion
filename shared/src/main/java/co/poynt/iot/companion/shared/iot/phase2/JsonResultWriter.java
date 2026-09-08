@@ -76,6 +76,8 @@ public final class JsonResultWriter {
             json.put("lastErrorDetail", state.lastErrorDetail);
             json.put("networkSummary", state.networkSummary);
             json.put("negativeSummary", state.negativeSummary);
+            json.put("releaseSummary", state.releaseSummary);
+            json.put("buildId", state.buildId);
             try (Writer writer = new OutputStreamWriter(new FileOutputStream(jsonFile), StandardCharsets.UTF_8)) {
                 writer.write(json.toString(2));
             }

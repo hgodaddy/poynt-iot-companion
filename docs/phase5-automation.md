@@ -49,3 +49,5 @@ Instrumented test `DashboardIdsTest` asserts dashboard and button ids, then taps
 ## PHMP
 
 Copy [`phmp-dropin/IotCompanionValidator.java`](../phmp-dropin/IotCompanionValidator.java) into PHMP and map `Result` onto `ValidationResult`. Check name is `IoT Companion Gate`.
+
+Phase 6 folds that check into a nightly release decision: [`docs/phase6-release-gate.md`](phase6-release-gate.md).

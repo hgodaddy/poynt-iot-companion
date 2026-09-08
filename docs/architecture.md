@@ -95,3 +95,7 @@ Environment is `DEV` / `OTE` / `PROD`. Endpoints load from gitignored `config/*.
 ## Phase 5 automation
 
 ADB, Appium, and PHMP consume files under `/sdcard/Android/data/co.poynt.cloudmessaging.iot.test/files/`. Contract: [`docs/phase5-automation.md`](phase5-automation.md).
+
+## Phase 6 release gate
+
+Nightly ship decision: production PCM + companion + IoT companion gate. [`docs/phase6-release-gate.md`](phase6-release-gate.md).

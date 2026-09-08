@@ -18,7 +18,7 @@ import co.poynt.cloudmessaging.iot.test.ui.DashboardActivity;
 import co.poynt.iot.companion.shared.automation.AutomationContract;
 
 /**
- * UIAutomator smoke: dashboard and action buttons exist. Does not run MQTT or PHMP_GATE.
+ * UIAutomator smoke: dashboard and action buttons exist. Does not run MQTT or RELEASE_GATE.
  */
 @RunWith(AndroidJUnit4.class)
 public class DashboardIdsTest {
@@ -52,9 +52,11 @@ public class DashboardIdsTest {
                 "btn_neg_network",
                 "btn_neg_suite",
                 "btn_phmp_gate",
+                "btn_release_gate",
                 "btn_collect_logs",
                 "value_eligibility",
                 "value_overall",
+                "value_release",
                 "evidence_log"
         };
         for (String id : ids) {

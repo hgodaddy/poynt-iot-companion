@@ -7,10 +7,11 @@
     "setGdToken": "co.poynt.cloudmessaging.iot.test.SET_GD_TOKEN",
     "runAction": "co.poynt.cloudmessaging.iot.test.RUN_ACTION"
   },
-  "extras": {
+    "extras": {
     "action": "action",
     "token": "token",
-    "timeoutSec": "timeoutSec"
+    "timeoutSec": "timeoutSec",
+    "buildId": "buildId"
   },
   "actions": [
     "ELIGIBILITY",
@@ -30,7 +31,8 @@
     "NEG_MQTT",
     "NEG_NETWORK",
     "NEG_SUITE",
-    "PHMP_GATE"
+    "PHMP_GATE",
+    "RELEASE_GATE"
   ],
   "filesDir": "/sdcard/Android/data/co.poynt.cloudmessaging.iot.test/files",
   "files": {
@@ -38,6 +40,7 @@
     "diagnostics": "iot-diagnostics.json",
     "negative": "iot-negative-results.json",
     "gate": "iot-phmp-gate.json",
+    "release": "iot-release-gate.json",
     "evidence": "iot-companion-evidence.txt"
   },
   "resourceIds": {
@@ -60,6 +63,7 @@
       "btn_neg_network",
       "btn_neg_suite",
       "btn_phmp_gate",
+      "btn_release_gate",
       "btn_collect_logs"
     ],
     "status": [
@@ -76,7 +80,8 @@
       "value_mqtt_state",
       "value_token_state",
       "value_last_error",
-      "value_negative"
+      "value_negative",
+      "value_release"
     ]
   },
   "appiumResourceIdPrefix": "co.poynt.cloudmessaging.iot.test:id/"

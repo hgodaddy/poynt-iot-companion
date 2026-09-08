@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "1.0",
+  "checkName": "IoT Release Gate Decision",
+  "packageName": "co.poynt.cloudmessaging.iot.test",
+  "companionVersion": "0.6.0-phase6",
+  "productionPackage": "co.poynt.cloudmessaging",
+  "buildId": "simulate",
+  "passed": false,
+  "skipped": false,
+  "releaseReady": false,
+  "status": "FAIL",
+  "message": "FAIL — IoT release blocked (production, device, or IoT companion gate)",
+  "checks": [
+    {"name": "Production Cloud Messaging APK", "passed": false, "skipped": false, "status": "FAIL", "critical": true, "message": "NOT INSTALLED"}
+  ]
+}

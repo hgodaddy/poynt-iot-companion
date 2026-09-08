@@ -33,6 +33,7 @@
     <string name="label_token_state">Token state</string>
     <string name="label_last_error">Last error</string>
     <string name="label_negative">Negative suite</string>
+    <string name="label_release">Release gate</string>
     <string name="btn_refresh">Refresh dashboard</string>
     <string name="btn_eligibility">Check Eligibility</string>
     <string name="btn_discover">Run Discover</string>
@@ -50,5 +51,6 @@
     <string name="btn_neg_network">Negative: network</string>
     <string name="btn_neg_suite">Run full negative suite</string>
     <string name="btn_phmp_gate">Run PHMP gate (flow + negatives)</string>
+    <string name="btn_release_gate">Run nightly release gate</string>
     <string name="btn_logs">Export evidence JSON</string>
 </resources>
