@@ -23,6 +23,8 @@ config/prod.properties
 foundation/poynt-cloudmessaging/
 logs/
 reports/
+docs/lab-runs/device-gate/*.log
+docs/lab-runs/device-gate/logcat*
 .cursor/
 .phase-snapshots/
 *.log

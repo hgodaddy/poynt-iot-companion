@@ -1,0 +1,72 @@
+{
+  "schemaVersion": "1.0",
+  "checkName": "IoT Release Gate Decision",
+  "packageName": "co.poynt.cloudmessaging.iot.test",
+  "companionVersion": "0.6.0-phase6",
+  "productionPackage": "co.poynt.cloudmessaging",
+  "productionVersion": "1.0-N12__-v2-d",
+  "buildId": "lab-P70-20260908",
+  "generatedAt": "2026-09-08T14:04:39+0300",
+  "passed": false,
+  "skipped": false,
+  "releaseReady": false,
+  "status": "FAIL",
+  "message": "FAIL — IoT release blocked (production, device, or IoT companion gate)",
+  "checks": [
+    {
+      "name": "Production Cloud Messaging APK",
+      "passed": true,
+      "skipped": false,
+      "status": "PASS",
+      "message": "INSTALLED pkg=co.poynt.cloudmessaging v1.0-N12__-v2-d code=26010001 priv=false svc=co.poynt.cloudmessaging\/co.poynt.cloudmessaging.PcmService",
+      "critical": true
+    },
+    {
+      "name": "Companion Test App",
+      "passed": true,
+      "skipped": false,
+      "status": "PASS",
+      "message": "pkg=co.poynt.cloudmessaging.iot.test v0.6.0-phase6",
+      "critical": true
+    },
+    {
+      "name": "Device \/ PoyntOS",
+      "passed": true,
+      "skipped": false,
+      "status": "PASS",
+      "message": "model=P70 serial=X7CA00000009 poyntOs=P70-userdebug 14 UKQ1.250303.001 userdebug-p70-a14-2.0.113-0213-142 test-keys android=14",
+      "critical": true
+    },
+    {
+      "name": "IoT Companion Gate",
+      "passed": false,
+      "skipped": false,
+      "status": "FAIL",
+      "message": "PHMP_GATE=FAIL — flow=FAIL negatives=PASS gate=\/storage\/emulated\/0\/Android\/data\/co.poynt.cloudmessaging.iot.test\/files\/iot-phmp-gate.json",
+      "critical": true
+    }
+  ],
+  "details": [
+    "production=INSTALLED",
+    "companion=0.6.0-phase6",
+    "device=P70",
+    "phmpGate=PHMP_GATE=FAIL — flow=FAIL negatives=PASS gate=\/storage\/emulated\/0\/Android\/data\/co.poynt.cloudmessaging.iot.test\/files\/iot-phmp-gate.json",
+    "tokenFingerprint=none"
+  ],
+  "metrics": {
+    "releaseReady": false,
+    "productionInstalled": true,
+    "productionEnabled": true,
+    "flowAndNegativesPass": false,
+    "iotOverall": "FAIL",
+    "negativeSummary": "12 pass \/ 0 fail \/ 1 skipped"
+  },
+  "files": {
+    "result": "iot-companion-result.json",
+    "diagnostics": "iot-diagnostics.json",
+    "negative": "iot-negative-results.json",
+    "evidence": "iot-companion-evidence.txt",
+    "gate": "iot-phmp-gate.json",
+    "release": "iot-release-gate.json"
+  }
+}

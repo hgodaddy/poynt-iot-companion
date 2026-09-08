@@ -1,29 +1,26 @@
 package co.poynt.cloudmessaging.iot.test;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.action.ViewActions.scrollTo;
+import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.withId;
 
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
-import androidx.test.platform.app.InstrumentationRegistry;
-import androidx.test.uiautomator.By;
-import androidx.test.uiautomator.UiDevice;
-import androidx.test.uiautomator.Until;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import co.poynt.cloudmessaging.iot.test.ui.DashboardActivity;
-import co.poynt.iot.companion.shared.automation.AutomationContract;
 
 /**
- * UIAutomator smoke: dashboard and action buttons exist. Does not run MQTT or RELEASE_GATE.
+ * Instrumented smoke: dashboard and action buttons exist. Does not run MQTT or RELEASE_GATE.
  */
 @RunWith(AndroidJUnit4.class)
 public class DashboardIdsTest {
-
-    private static final long WAIT_MS = 8_000L;
 
     @Rule
     public ActivityScenarioRule<DashboardActivity> activityRule =
@@ -31,38 +28,36 @@ public class DashboardIdsTest {
 
     @Test
     public void dashboardExposesStableResourceIds() {
-        UiDevice device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
-        String pkg = AutomationContract.PACKAGE;
-        assertTrue(device.wait(Until.hasObject(By.res(pkg, "dashboard_root")), WAIT_MS));
-        String[] ids = {
-                "btn_refresh",
-                "btn_check_eligibility",
-                "btn_run_discover",
-                "btn_refresh_token",
-                "btn_connect_mqtt",
-                "btn_disconnect_mqtt",
-                "btn_reconnect",
-                "btn_subscribe",
-                "btn_publish",
-                "btn_full_flow",
-                "btn_diagnostics",
-                "btn_neg_token",
-                "btn_neg_discover",
-                "btn_neg_mqtt",
-                "btn_neg_network",
-                "btn_neg_suite",
-                "btn_phmp_gate",
-                "btn_release_gate",
-                "btn_collect_logs",
-                "value_eligibility",
-                "value_overall",
-                "value_release",
-                "evidence_log"
+        onView(withId(R.id.dashboard_root)).check(matches(isDisplayed()));
+        int[] ids = {
+                R.id.btn_refresh,
+                R.id.btn_check_eligibility,
+                R.id.btn_run_discover,
+                R.id.btn_refresh_token,
+                R.id.btn_connect_mqtt,
+                R.id.btn_disconnect_mqtt,
+                R.id.btn_reconnect,
+                R.id.btn_subscribe,
+                R.id.btn_publish,
+                R.id.btn_full_flow,
+                R.id.btn_diagnostics,
+                R.id.btn_neg_token,
+                R.id.btn_neg_discover,
+                R.id.btn_neg_mqtt,
+                R.id.btn_neg_network,
+                R.id.btn_neg_suite,
+                R.id.btn_phmp_gate,
+                R.id.btn_release_gate,
+                R.id.btn_collect_logs,
+                R.id.value_eligibility,
+                R.id.value_overall,
+                R.id.value_release,
+                R.id.evidence_log
         };
-        for (String id : ids) {
-            assertNotNull("missing " + id, device.findObject(By.res(pkg, id)));
+        for (int id : ids) {
+            onView(withId(id)).perform(scrollTo()).check(matches(isDisplayed()));
         }
-        device.findObject(By.res(pkg, "btn_refresh")).click();
-        assertTrue(device.wait(Until.hasObject(By.res(pkg, "dashboard_root")), WAIT_MS));
+        onView(withId(R.id.btn_refresh)).perform(scrollTo(), click());
+        onView(withId(R.id.dashboard_root)).check(matches(isDisplayed()));
     }
 }
