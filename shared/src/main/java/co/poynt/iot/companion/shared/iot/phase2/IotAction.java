@@ -19,5 +19,6 @@ public enum IotAction {
     NEG_DISCOVER,
     NEG_MQTT,
     NEG_NETWORK,
-    NEG_SUITE
+    NEG_SUITE,
+    PHMP_GATE
 }

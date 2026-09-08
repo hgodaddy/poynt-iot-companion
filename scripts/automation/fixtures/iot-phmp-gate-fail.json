@@ -1,0 +1,10 @@
+{
+  "schemaVersion": "1.0",
+  "checkName": "IoT Companion Gate",
+  "packageName": "co.poynt.cloudmessaging.iot.test",
+  "companionVersion": "0.5.0-phase5",
+  "passed": false,
+  "skipped": false,
+  "status": "FAIL",
+  "message": "IoT companion gate FAIL — flow=FAIL negatives=PASS"
+}

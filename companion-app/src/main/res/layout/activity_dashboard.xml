@@ -26,7 +26,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="Phase 4 negative tests · PST3 / P70"
+            android:text="Phase 5 automation · PST3 / P70"
             android:textColor="@color/text_muted"
             android:textSize="13sp" />
 
@@ -186,6 +186,7 @@
         <com.google.android.material.button.MaterialButton android:id="@+id/btn_neg_mqtt" style="@style/Iot.Action.Secondary" android:layout_width="match_parent" android:layout_height="wrap_content" android:contentDescription="@string/btn_neg_mqtt" android:text="@string/btn_neg_mqtt" />
         <com.google.android.material.button.MaterialButton android:id="@+id/btn_neg_network" style="@style/Iot.Action.Secondary" android:layout_width="match_parent" android:layout_height="wrap_content" android:contentDescription="@string/btn_neg_network" android:text="@string/btn_neg_network" />
         <com.google.android.material.button.MaterialButton android:id="@+id/btn_neg_suite" style="@style/Iot.Action" android:layout_width="match_parent" android:layout_height="wrap_content" android:contentDescription="@string/btn_neg_suite" android:text="@string/btn_neg_suite" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/btn_phmp_gate" style="@style/Iot.Action" android:layout_width="match_parent" android:layout_height="wrap_content" android:contentDescription="@string/btn_phmp_gate" android:text="@string/btn_phmp_gate" />
         <com.google.android.material.button.MaterialButton android:id="@+id/btn_collect_logs" style="@style/Iot.Action.Secondary" android:layout_width="match_parent" android:layout_height="wrap_content" android:contentDescription="@string/btn_logs" android:text="@string/btn_logs" />
 
         <TextView

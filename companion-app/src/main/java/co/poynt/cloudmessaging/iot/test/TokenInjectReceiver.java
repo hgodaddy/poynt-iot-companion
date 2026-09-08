@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
 
+import co.poynt.iot.companion.shared.automation.AutomationContract;
 import co.poynt.iot.companion.shared.config.EnvironmentConfig;
 import co.poynt.iot.companion.shared.iot.phase2.GdTokenStore;
 import co.poynt.iot.companion.shared.iot.phase2.JwtInspector;
@@ -16,15 +17,13 @@ import co.poynt.iot.companion.shared.logging.EvidenceLogger;
  */
 public class TokenInjectReceiver extends BroadcastReceiver {
 
-    public static final String ACTION = "co.poynt.cloudmessaging.iot.test.SET_GD_TOKEN";
-
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (intent == null || !ACTION.equals(intent.getAction())) {
+        if (intent == null || !AutomationContract.ACTION_SET_GD_TOKEN.equals(intent.getAction())) {
             return;
         }
-        String token = intent.getStringExtra("token");
-        EvidenceLogger logger = new EvidenceLogger();
+        String token = intent.getStringExtra(AutomationContract.EXTRA_TOKEN);
+        EvidenceLogger logger = logger(context);
         if (TextUtils.isEmpty(token)) {
             context.getSharedPreferences(EnvironmentConfig.PREFS, Context.MODE_PRIVATE)
                     .edit()
@@ -36,5 +35,13 @@ public class TokenInjectReceiver extends BroadcastReceiver {
         new GdTokenStore(context, logger).save(token);
         JwtInspector inspect = JwtInspector.inspect(token);
         logger.pass("GD token injected via broadcast " + inspect.summary);
+    }
+
+    private static EvidenceLogger logger(Context context) {
+        Context appCtx = context.getApplicationContext();
+        if (appCtx instanceof CompanionApp) {
+            return ((CompanionApp) appCtx).facade().logger();
+        }
+        return new EvidenceLogger();
     }
 }

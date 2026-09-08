@@ -1,11 +1,14 @@
 package co.poynt.iot.companion.shared.iot.phase2;
 
 import android.content.Context;
+import android.content.pm.PackageInfo;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import org.json.JSONObject;
+
+import co.poynt.iot.companion.shared.automation.AutomationContract;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -27,10 +30,14 @@ public final class JsonResultWriter {
     public static final String LOG_NAME = "iot-companion-evidence.txt";
 
     private final File dir;
+    private final String packageName;
+    private final String companionVersion;
 
     public JsonResultWriter(@NonNull Context context) {
         File external = context.getExternalFilesDir(null);
         this.dir = external != null ? external : context.getFilesDir();
+        this.packageName = context.getPackageName();
+        this.companionVersion = versionName(context);
     }
 
     @Nullable
@@ -41,6 +48,9 @@ public final class JsonResultWriter {
             }
             File jsonFile = new File(dir, FILE_NAME);
             JSONObject json = new JSONObject();
+            json.put("schemaVersion", AutomationContract.SCHEMA_VERSION);
+            json.put("packageName", packageName);
+            json.put("companionVersion", companionVersion);
             json.put("generatedAt", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US).format(new Date()));
             json.put("clientId", state.clientId);
             json.put("iotEnabled", state.iotEnabled);
@@ -77,6 +87,16 @@ public final class JsonResultWriter {
         } catch (Exception e) {
             logger.fail("JSON export failed: " + e.getMessage());
             return null;
+        }
+    }
+
+    @NonNull
+    private static String versionName(@NonNull Context context) {
+        try {
+            PackageInfo info = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+            return info.versionName == null ? "unknown" : info.versionName;
+        } catch (Exception e) {
+            return "unknown";
         }
     }
 }

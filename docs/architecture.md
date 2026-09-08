@@ -91,3 +91,7 @@ Run `./scripts/map-foundation.sh` after clone. It writes `docs/foundation-invent
 ## Secrets
 
 Environment is `DEV` / `OTE` / `PROD`. Endpoints load from gitignored `config/*.properties` or device SharedPreferences. The APK must never hard-code AWS credentials or certificates.
+
+## Phase 5 automation
+
+ADB, Appium, and PHMP consume files under `/sdcard/Android/data/co.poynt.cloudmessaging.iot.test/files/`. Contract: [`docs/phase5-automation.md`](phase5-automation.md).

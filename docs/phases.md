@@ -12,22 +12,24 @@
 
 `feature/companion-test-app-phase-3`
 
-## Phase 4 — Negative testing (this branch)
+## Phase 4 — Negative testing (done)
+
+`feature/companion-test-app-phase-4`
 
 PASS means the companion **correctly detected** the failure. SKIPPED is allowed (suite still PASS). Overall FAIL if any scenario FAILs.
 
-| Group | Scenarios |
-|---|---|
-| Token | missing store, expired JWT, invalid JWT (restores previous token) |
-| Discover | timeout (`192.0.2.1`), HTTP 404 path, duplicate in-flight, invalid host |
-| MQTT | publish/subscribe while disconnected, junk JWT connect, invalid host timeout |
-| Network | blackhole `192.0.2.1:443`; Wi-Fi off/on (SKIPPED with `adb shell svc wifi disable` if the APK cannot toggle) |
+## Phase 5 — Automation (this branch)
 
-Results: `iot-negative-results.json`.
+`feature/companion-test-app-phase-5`
 
-## Phase 5 — Automation
+- Broadcast `RUN_ACTION` / `PHMP_GATE` on the live `IotController`
+- Gate file `iot-phmp-gate.json` for PHMP (`status`, `passed`, `skipped`, `details`, `metrics`)
+- Stable dashboard resource ids (`automation/ids.json`)
+- Host scripts under `scripts/automation/`
+- UIAutomator id smoke test (no MQTT)
+- PHMP drop-in `phmp-dropin/IotCompanionValidator.java`
 
-Appium/UIAutomator on view ids, consume `iot-companion-result.json` / `iot-negative-results.json` in PHMP.
+Details: [`docs/phase5-automation.md`](phase5-automation.md).
 
 ## Phase 6 — Release validation
 

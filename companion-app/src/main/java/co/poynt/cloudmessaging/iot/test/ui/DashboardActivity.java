@@ -1,5 +1,6 @@
 package co.poynt.cloudmessaging.iot.test.ui;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -8,12 +9,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import co.poynt.cloudmessaging.iot.test.CompanionApp;
 import co.poynt.cloudmessaging.iot.test.databinding.ActivityDashboardBinding;
 import co.poynt.iot.companion.shared.CompanionFacade;
 import co.poynt.iot.companion.shared.DashboardSnapshot;
+import co.poynt.iot.companion.shared.automation.AutomationContract;
 import co.poynt.iot.companion.shared.diagnostics.DiagnosticSnapshot;
 import co.poynt.iot.companion.shared.iot.IotStatusSnapshot;
 import co.poynt.iot.companion.shared.iot.phase2.IotAction;
@@ -50,15 +53,37 @@ public class DashboardActivity extends AppCompatActivity implements IotControlle
         binding.btnNegMqtt.setOnClickListener(v -> run(IotAction.NEG_MQTT));
         binding.btnNegNetwork.setOnClickListener(v -> run(IotAction.NEG_NETWORK));
         binding.btnNegSuite.setOnClickListener(v -> run(IotAction.NEG_SUITE));
+        binding.btnPhmpGate.setOnClickListener(v -> run(IotAction.PHMP_GATE));
         binding.btnCollectLogs.setOnClickListener(v -> run(IotAction.EXPORT));
 
         render("startup");
+        if (savedInstanceState == null) {
+            maybeRunFromIntent(getIntent());
+        }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        maybeRunFromIntent(intent);
     }
 
     @Override
     protected void onDestroy() {
         facade.iot().setListener(null);
         super.onDestroy();
+    }
+
+    private void maybeRunFromIntent(@Nullable Intent intent) {
+        if (intent == null) {
+            return;
+        }
+        IotAction action = AutomationContract.parseAction(intent.getStringExtra(AutomationContract.EXTRA_ACTION));
+        if (action == null) {
+            return;
+        }
+        main.post(() -> run(action));
     }
 
     private void run(@NonNull IotAction action) {
@@ -126,29 +151,36 @@ public class DashboardActivity extends AppCompatActivity implements IotControlle
         String last = iot.lastMessageAt;
         if (iot.tokenDetail != null && !iot.tokenDetail.isEmpty()) {
             binding.valueToken.setText(iot.gdToken);
+            binding.valueToken.setContentDescription(iot.gdToken);
         }
         binding.valueLastMessage.setText(last);
+        binding.valueLastMessage.setContentDescription(last);
     }
 
     private void bindDiagnostics(@NonNull DiagnosticSnapshot diagnostics) {
         binding.valueNetwork.setText(diagnostics.networkSummary);
+        binding.valueNetwork.setContentDescription(diagnostics.networkSummary);
         tint(binding.valueNetwork, diagnostics.httpsReachable || diagnostics.wifiEnabled);
 
         binding.valueMqttState.setText(diagnostics.mqttState + "  attempts=" + diagnostics.mqttAttempts);
+        binding.valueMqttState.setContentDescription(diagnostics.mqttState);
         colorStatus(binding.valueMqttState, diagnostics.mqttState);
 
         binding.valueTokenState.setText(diagnostics.tokenState + "  fp=" + diagnostics.tokenFingerprint);
+        binding.valueTokenState.setContentDescription(diagnostics.tokenState);
         String tokenGate = "PRESENT".equals(diagnostics.tokenState)
                 ? IotStatusSnapshot.PASS
                 : ("UNKNOWN".equals(diagnostics.tokenState) ? IotStatusSnapshot.UNKNOWN : IotStatusSnapshot.FAIL);
         colorStatus(binding.valueTokenState, tokenGate);
 
         binding.valueLastError.setText(diagnostics.lastErrorCode + "  " + diagnostics.lastErrorDetail);
+        binding.valueLastError.setContentDescription(diagnostics.lastErrorCode);
         boolean noError = "IOT-000".equals(diagnostics.lastErrorCode);
         binding.valueLastError.setTextColor(Color.parseColor(noError ? "#A0A0A0" : "#FF6B6B"));
 
         String summary = facade.iot().state().negativeSummary;
         binding.valueNegative.setText(summary);
+        binding.valueNegative.setContentDescription(summary);
         if ("—".equals(summary)) {
             colorStatus(binding.valueNegative, IotStatusSnapshot.UNKNOWN);
         } else if (summary.contains("/ 0 fail")) {
@@ -175,11 +207,13 @@ public class DashboardActivity extends AppCompatActivity implements IotControlle
         binding.btnNegMqtt.setEnabled(enabled);
         binding.btnNegNetwork.setEnabled(enabled);
         binding.btnNegSuite.setEnabled(enabled);
+        binding.btnPhmpGate.setEnabled(enabled);
         binding.btnCollectLogs.setEnabled(enabled);
     }
 
     private void setStatus(@NonNull TextView view, @NonNull String status) {
         view.setText(status);
+        view.setContentDescription(status);
         colorStatus(view, status);
     }
 

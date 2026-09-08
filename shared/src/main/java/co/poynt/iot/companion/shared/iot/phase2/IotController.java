@@ -19,6 +19,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import co.poynt.iot.companion.shared.automation.PhmpGateWriter;
 import co.poynt.iot.companion.shared.config.EnvironmentConfig;
 import co.poynt.iot.companion.shared.diagnostics.DiagnosticSnapshot;
 import co.poynt.iot.companion.shared.diagnostics.DiagnosticsStore;
@@ -53,6 +54,7 @@ public final class IotController implements CompanionMqttClient.Listener {
     private final GdTokenStore tokenStore;
     private final CompanionMqttClient mqtt;
     private final JsonResultWriter jsonWriter;
+    private final PhmpGateWriter phmpGateWriter;
     private final NetworkInspector networkInspector;
     private final DiagnosticsStore diagnosticsStore;
     private final NegativeTestHarness negativeHarness;
@@ -77,6 +79,7 @@ public final class IotController implements CompanionMqttClient.Listener {
         this.tokenStore = new GdTokenStore(appContext, logger);
         this.mqtt = new CompanionMqttClient(logger);
         this.jsonWriter = new JsonResultWriter(appContext);
+        this.phmpGateWriter = new PhmpGateWriter(appContext);
         this.networkInspector = new NetworkInspector(appContext);
         this.diagnosticsStore = new DiagnosticsStore(appContext);
         this.logger.setPersistSink(diagnosticsStore);
@@ -115,14 +118,13 @@ public final class IotController implements CompanionMqttClient.Listener {
     public void execute(@NonNull IotAction action) {
         if (!busy.compareAndSet(false, true)) {
             logger.info("Ignored " + action + " — another action is running");
+            notifyComplete(new IotActionResult(action, false, "busy"));
             notifyUpdated();
             return;
         }
         executor.execute(() -> {
             try {
-                IotActionResult result = action == IotAction.FULL_FLOW
-                        ? runFullFlow()
-                        : runSingle(action);
+                IotActionResult result = dispatch(action);
                 state.computeOverall();
                 if (action != IotAction.DIAGNOSTICS) {
                     refreshDiagnostics(false);
@@ -133,6 +135,58 @@ public final class IotController implements CompanionMqttClient.Listener {
                 notifyUpdated();
             }
         });
+    }
+
+    /**
+     * Host / PHMP path: wait until the action finishes or {@code timeoutMs} elapses.
+     * Must not be called from the IotController executor thread.
+     */
+    @NonNull
+    public IotActionResult executeBlocking(@NonNull IotAction action, long timeoutMs) {
+        CountDownLatch done = new CountDownLatch(1);
+        final IotActionResult[] holder = new IotActionResult[1];
+        Listener previous = listener;
+        setListener(new Listener() {
+            @Override
+            public void onUpdated() {
+                if (previous != null) {
+                    previous.onUpdated();
+                }
+            }
+
+            @Override
+            public void onComplete(@NonNull IotActionResult result) {
+                holder[0] = result;
+                if (previous != null) {
+                    previous.onComplete(result);
+                }
+                done.countDown();
+            }
+        });
+        try {
+            execute(action);
+            boolean finished = done.await(Math.max(1_000L, timeoutMs), TimeUnit.MILLISECONDS);
+            if (!finished) {
+                return new IotActionResult(action, false, "timed out after " + timeoutMs + "ms");
+            }
+            return holder[0] != null ? holder[0] : new IotActionResult(action, false, "no result");
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return new IotActionResult(action, false, "interrupted");
+        } finally {
+            setListener(previous);
+        }
+    }
+
+    @NonNull
+    private IotActionResult dispatch(@NonNull IotAction action) {
+        if (action == IotAction.FULL_FLOW) {
+            return runFullFlow();
+        }
+        if (action == IotAction.PHMP_GATE) {
+            return runPhmpGate();
+        }
+        return runSingle(action);
     }
 
     @NonNull
@@ -203,6 +257,27 @@ public final class IotController implements CompanionMqttClient.Listener {
         logger.pass("FULL IoT FLOW PASS");
         state.overall = IotStatusSnapshot.PASS;
         return new IotActionResult(IotAction.FULL_FLOW, true, "All IoT steps passed");
+    }
+
+    @NonNull
+    private IotActionResult runPhmpGate() {
+        logger.info("PHMP_GATE start — full flow then negative suite");
+        IotActionResult flow = runFullFlow();
+        notifyUpdated();
+        IotActionResult negatives = runNegatives(IotAction.NEG_SUITE, negativeHarness.runAll());
+        notifyUpdated();
+        String gatePath = phmpGateWriter.write(state, flow, negatives);
+        jsonWriter.write(state, logger);
+        boolean pass = flow.pass && negatives.pass;
+        String detail = "flow=" + flow.status
+                + " negatives=" + negatives.status
+                + (gatePath == null ? "" : " gate=" + gatePath);
+        if (pass) {
+            logger.pass("PHMP_GATE PASS — " + detail);
+        } else {
+            logger.fail("PHMP_GATE FAIL — " + detail);
+        }
+        return new IotActionResult(IotAction.PHMP_GATE, pass, detail);
     }
 
     @NonNull
